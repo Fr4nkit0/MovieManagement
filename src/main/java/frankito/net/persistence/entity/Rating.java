@@ -1,9 +1,11 @@
 package frankito.net.persistence.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import org.hibernate.annotations.Check;
 
 @Entity
+@Builder
 public class Rating {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,10 +1,12 @@
 package frankito.net.persistence.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 
 import java.util.List;
 
 @Entity
+@Builder
 public class User {
 
     @Id

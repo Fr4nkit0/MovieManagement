@@ -1,11 +1,16 @@
 package frankito.net.persistence.entity;
 
+import frankito.net.util.MovieGenre;
 import jakarta.persistence.*;
-import org.springframework.data.repository.cdi.Eager;
+import lombok.Builder;
+import org.hibernate.annotations.CreationTimestamp;
 
+
+import java.time.LocalDateTime;
 import java.util.List;
 
-@Eager
+@Entity
+@Builder
 public class Movie {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -14,8 +19,12 @@ public class Movie {
     private String title;
     @Column(nullable = false)
     private String director;
-    private String genre;
+    @Enumerated(EnumType.STRING)
+    private MovieGenre genre;
     private int releaseYear;
+    @CreationTimestamp
+    @Column(updatable = false,columnDefinition = "TIMESTAMP DEFAULT NOW()")
+    private LocalDateTime createdAt;
     @OneToMany(fetch = FetchType.EAGER,mappedBy = "movie")
     private List<Rating> ratings;
 
@@ -45,12 +54,15 @@ public class Movie {
     public void setDirector(String director) {
         this.director = director;
     }
-    public String getGenre() {
+
+    public MovieGenre getGenre() {
         return genre;
     }
-    public void setGenre(String genre) {
+
+    public void setGenre(MovieGenre genre) {
         this.genre = genre;
     }
+
     public int getReleaseYear() {
         return releaseYear;
     }
