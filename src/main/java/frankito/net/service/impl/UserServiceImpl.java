@@ -20,7 +20,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<GetUser> findALl() {
-        return UserMapper.toGetDtoList(userRepository.findAll());
+        List<User> users=userRepository.findAll();
+        if (users.isEmpty())throw new ResourceNotFoundException("empty records");
+        return UserMapper.toGetDtoList(users);
     }
     @Override
     public GetUser findOneById(Long id) {

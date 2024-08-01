@@ -20,7 +20,9 @@ public class MovieServiceImpl implements MovieService {
 
     @Override
     public List<GetMovie> findALl() {
-        return MovieMapper.toGetDtoList(movieRepository.findAll());
+        List<Movie> movies = movieRepository.findAll();
+        if(movies.isEmpty()) throw new ResourceNotFoundException("empty records");
+        return MovieMapper.toGetDtoList(movies);
     }
 
     @Override
