@@ -1,8 +1,9 @@
 package frankito.net.exceptions;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
+import lombok.Getter;
+
+@Getter
 public class InvalidPasswordException extends RuntimeException{
     private final String password;
     private final String passwordRepeated;
@@ -22,15 +23,5 @@ public class InvalidPasswordException extends RuntimeException{
     public String getMessage() {
         return "Invalid Password: " + errorDescription;
     }
-    public String getPassword() {
-        return password;
-    }
 
-    public String getPasswordRepeated() {
-        return passwordRepeated;
-    }
-
-    public String getErrorDescription() {
-        return errorDescription;
-    }
 }
