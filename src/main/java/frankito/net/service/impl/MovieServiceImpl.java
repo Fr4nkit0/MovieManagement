@@ -1,11 +1,13 @@
 package frankito.net.service.impl;
 
+import frankito.net.dto.request.MovieSearchCriteria;
 import frankito.net.dto.request.SaveMovie;
 import frankito.net.dto.response.GetMovie;
 import frankito.net.exceptions.ResourceNotFoundException;
 import frankito.net.mapper.MovieMapper;
 import frankito.net.persistence.entity.Movie;
 import frankito.net.persistence.repository.MovieRepository;
+import frankito.net.persistence.specification.FindAllMoviesSpecification;
 import frankito.net.service.MovieService;
 
 import java.util.List;
@@ -19,8 +21,9 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public List<GetMovie> findALl() {
-        List<Movie> movies = movieRepository.findAll();
+    public List<GetMovie> findALl(MovieSearchCriteria searchCriteria) {
+        FindAllMoviesSpecification moviesSpecification = new FindAllMoviesSpecification(searchCriteria);
+        List<Movie> movies = movieRepository.findAll(moviesSpecification);
         if(movies.isEmpty()) throw new ResourceNotFoundException("empty records");
         return MovieMapper.toGetDtoList(movies);
     }

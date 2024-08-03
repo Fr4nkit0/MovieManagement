@@ -1,5 +1,6 @@
 package frankito.net.controller;
 
+import frankito.net.dto.request.MovieSearchCriteria;
 import frankito.net.dto.request.SaveMovie;
 import frankito.net.dto.response.GetMovie;
 import frankito.net.service.MovieService;
@@ -20,8 +21,13 @@ public class MovieController {
         this.movieService = movieService;
     }
     @GetMapping("/movies")
-    public ResponseEntity<List<GetMovie>> findALl (){
-        return ResponseEntity.ok(movieService.findALl());
+    public ResponseEntity<List<GetMovie>> findALl (@RequestParam(required = false) String title,
+                                                   @RequestParam(required = false, name = "min_release_year") Integer minReleaseYear,
+                                                   @RequestParam(required = false, name = "max_release_year") Integer maxReleaseYear,
+                                                   @RequestParam(required = false, name = "min_average_rating")Integer minAverageRating){
+        MovieSearchCriteria searchCriteria = new MovieSearchCriteria(title,minReleaseYear,
+                maxReleaseYear,minAverageRating);
+        return ResponseEntity.ok(movieService.findALl(searchCriteria));
     }
     @GetMapping("/movie/{movieId}")
     public ResponseEntity<GetMovie> findOne (@PathVariable Long movieId){
