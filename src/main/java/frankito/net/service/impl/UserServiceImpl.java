@@ -1,6 +1,7 @@
 package frankito.net.service.impl;
 
 import frankito.net.dto.request.SaveUser;
+import frankito.net.dto.request.UserSearchCriteria;
 import frankito.net.dto.response.GetUser;
 import frankito.net.exceptions.ResourceNotFoundException;
 import frankito.net.mapper.UserMapper;
@@ -8,7 +9,13 @@ import frankito.net.persistence.entity.User;
 import frankito.net.persistence.repository.UserRepository;
 import frankito.net.service.UserService;
 import frankito.net.service.validator.PasswordValidator;
-
+import jakarta.persistence.criteria.Predicate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.util.StringUtils;
+import jakarta.persistence.criteria.Predicate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class UserServiceImpl implements UserService {
@@ -19,10 +26,24 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<GetUser> findALl() {
-        List<User> users=userRepository.findAll();
+    public Page<GetUser> findALl(UserSearchCriteria searchCriteria,Pageable pageable) {
+        Specification<User> specification = (root,query,criteriaBuilder)->{
+            List<Predicate> predicates= new ArrayList<>();
+            if (StringUtils.hasText(searchCriteria.name())){
+                Predicate nameLike=criteriaBuilder.like(root.get("name"),"%".concat(searchCriteria.name()).concat("%"));
+                predicates.add(nameLike);
+
+            }
+            if (StringUtils.hasText(searchCriteria.username())){
+                Predicate usernameLike=criteriaBuilder.like(root.get("username"),
+                        "%".concat(searchCriteria.username()).concat("%")  );
+                predicates.add(usernameLike);
+            }
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        } ;
+        Page<User> users=userRepository.findAll(specification,pageable);
         if (users.isEmpty())throw new ResourceNotFoundException("empty records");
-        return UserMapper.toGetDtoList(users);
+        return users.map(UserMapper::toGetDto);
     }
     @Override
     public GetUser findOneById(Long id) {

@@ -9,6 +9,8 @@ import frankito.net.persistence.entity.Movie;
 import frankito.net.persistence.repository.MovieRepository;
 import frankito.net.persistence.specification.FindAllMoviesSpecification;
 import frankito.net.service.MovieService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -21,11 +23,11 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public List<GetMovie> findALl(MovieSearchCriteria searchCriteria) {
+    public Page<GetMovie> findALl(MovieSearchCriteria searchCriteria, Pageable pageable) {
         FindAllMoviesSpecification moviesSpecification = new FindAllMoviesSpecification(searchCriteria);
-        List<Movie> movies = movieRepository.findAll(moviesSpecification);
+        Page<Movie> movies = movieRepository.findAll(moviesSpecification,pageable);
         if(movies.isEmpty()) throw new ResourceNotFoundException("empty records");
-        return MovieMapper.toGetDtoList(movies);
+        return movies.map(MovieMapper::toGetDto);
     }
 
     @Override
