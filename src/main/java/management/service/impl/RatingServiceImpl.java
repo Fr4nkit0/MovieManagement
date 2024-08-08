@@ -3,6 +3,8 @@ package management.service.impl;
 import jakarta.persistence.EntityManager;
 import management.dto.request.SaveRating;
 import management.dto.response.GetCompleteRating;
+import management.dto.response.GetMovie;
+import management.dto.response.GetUser;
 import management.exceptions.DuplicateRatingException;
 import management.exceptions.ResourceNotFoundException;
 import management.mapper.RatingMapper;
@@ -13,7 +15,11 @@ import management.service.RatingService;
 import management.service.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+@Service
+@Transactional
 public class RatingServiceImpl implements RatingService {
     private final RatingRepository ratingRepository;
     private final UserService userService;
@@ -24,24 +30,28 @@ public class RatingServiceImpl implements RatingService {
         this.userService = userService;
         this.entityManager = entityManager;
     }
-
+    @Transactional(readOnly = true)
     @Override
     public Page<GetCompleteRating> findALl(Pageable pageable) {
         Page<Rating> page = ratingRepository.findAll(pageable);
         if (page.isEmpty()) throw  new ResourceNotFoundException("empty records");
         return  page.map(RatingMapper::toGetCompleteRatingDto);
     }
-
+    @Transactional(readOnly = true)
     @Override
-    public Page<GetCompleteRating> findALlMovieId(Long movieId, Pageable pageable) {
-        return ratingRepository.findByMovieId(movieId,pageable).map(RatingMapper::toGetCompleteRatingDto);
+    public Page<GetMovie.GetRating> findALlMovieId(Long movieId, Pageable pageable) {
+        Page<Rating> page=ratingRepository.findByMovieId(movieId,pageable);
+        if (page.isEmpty()) throw  new ResourceNotFoundException("empty records");
+        return page.map(RatingMapper::toGetMovieRatingDto);
     }
-
+    @Transactional(readOnly = true)
     @Override
-    public Page<GetCompleteRating> findALlUsername(String username, Pageable pageable) {
-        return ratingRepository.findByUsername(username,pageable).map(RatingMapper::toGetCompleteRatingDto);
+    public Page<GetUser.GetRating> findALlUsername(String username, Pageable pageable) {
+        Page<Rating> page = ratingRepository.findByUsername(username,pageable);
+        if (page.isEmpty()) throw  new ResourceNotFoundException("empty records");
+        return ratingRepository.findByUsername(username,pageable).map(RatingMapper::toGetUserRatingDto);
     }
-
+    @Transactional(readOnly = true)
     @Override
     public GetCompleteRating findById(Long ratingId) {
         return RatingMapper.toGetCompleteRatingDto(findByIdEntity(ratingId));

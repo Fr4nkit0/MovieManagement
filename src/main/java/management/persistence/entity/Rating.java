@@ -1,11 +1,15 @@
 package management.persistence.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Check;
 
 @Entity
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(uniqueConstraints =  @UniqueConstraint(columnNames = {"movie_id","user_id"}))
 public class Rating {
     @Id

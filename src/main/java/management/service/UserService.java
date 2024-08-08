@@ -3,6 +3,7 @@ package management.service;
 import management.dto.request.UserSearchCriteria;
 import management.dto.request.SaveUser;
 import management.dto.response.GetUser;
+import management.dto.response.GetUserStatistic;
 import management.exceptions.ResourceNotFoundException;
 import management.persistence.entity.User;
 import org.springframework.data.domain.Page;
@@ -12,10 +13,10 @@ public interface UserService {
     Page<GetUser> findALl (UserSearchCriteria searchCriteria, Pageable pageable);
     /**
      * @param username
-     * @throws {@link ResourceNotFoundException} if the given username dot not exist
      * @return
+     * @throws {@link ResourceNotFoundException} if the given username dot not exist
      */
-    GetUser findOneByUsername (String username);
+    GetUserStatistic findOneByUsername (String username);
     GetUser createOne (SaveUser saveUser);
     /**
      * @param username

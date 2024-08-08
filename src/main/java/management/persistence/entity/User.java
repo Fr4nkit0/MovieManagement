@@ -1,12 +1,18 @@
 package management.persistence.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
 
     @Id
@@ -18,7 +24,10 @@ public class User {
     private String name;
     @Column(nullable = false)
     private String password;
-    @OneToMany(fetch = FetchType.EAGER,mappedBy = "user")
+    @CreationTimestamp
+    @Column(updatable = false, columnDefinition = "TIMESTAMP DEFAULT NOW()")
+    private LocalDateTime createdAt;
+    @OneToMany(fetch = FetchType.EAGER,mappedBy = "user",cascade = {CascadeType.REMOVE})
     private List<Rating> ratings;
 
     public Long getId() {
@@ -40,6 +49,7 @@ public class User {
         this.name = name;
     }
 
+
     public String getPassword() {
         return password;
     }
@@ -53,5 +63,13 @@ public class User {
 
     public void setRatings(List<Rating> ratings) {
         this.ratings = ratings;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 }

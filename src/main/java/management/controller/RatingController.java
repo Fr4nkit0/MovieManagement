@@ -13,7 +13,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 
-@RestController("api/v1")
+@RestController
+@RequestMapping("ratings")
 public class RatingController {
     private final RatingService ratingService;
     @Autowired
@@ -21,15 +22,15 @@ public class RatingController {
         this.ratingService = ratingService;
     }
 
-    @GetMapping("/ratings")
+    @GetMapping
     public ResponseEntity<Page<GetCompleteRating>>findALl (Pageable pageable){
         return ResponseEntity.ok(ratingService.findALl(pageable));
     }
-    @GetMapping("/rating/{ratingId}")
+    @GetMapping("/{ratingId}")
     public ResponseEntity<GetCompleteRating> findById (@PathVariable Long ratingId){
         return ResponseEntity.ok(ratingService.findById(ratingId));
     }
-    @PostMapping("/rating")
+    @PostMapping
     public ResponseEntity<GetCompleteRating> createOne (@RequestBody SaveRating saveRating,
                                                         HttpServletRequest request){
         GetCompleteRating rating = ratingService.createOne(saveRating);
@@ -38,12 +39,12 @@ public class RatingController {
         URI urlCreated = URI.create(urlRequest + "/" + rating.ratingId());
         return ResponseEntity.created(urlCreated).body(rating);
     }
-    @PutMapping("/rating/{ratingId}")
+    @PutMapping("/{ratingId}")
     public ResponseEntity<GetCompleteRating> updateById (@RequestBody SaveRating updateRating,
                                                          @PathVariable Long ratingId){
         return ResponseEntity.ok(ratingService.updateOneById(updateRating,ratingId));
     }
-    @DeleteMapping("/rating/{ratingId}")
+    @DeleteMapping("/{ratingId}")
     public ResponseEntity<Void> deleteOneById (@PathVariable Long ratingId){
         ratingService.deleteOneById(ratingId);
         return  ResponseEntity.noContent().build();

@@ -3,9 +3,11 @@ package management.service.impl;
 import management.dto.request.UserSearchCriteria;
 import management.dto.request.SaveUser;
 import management.dto.response.GetUser;
+import management.dto.response.GetUserStatistic;
 import management.exceptions.ResourceNotFoundException;
 import management.mapper.UserMapper;
 import management.persistence.entity.User;
+import management.persistence.repository.RatingRepository;
 import management.persistence.repository.UserRepository;
 import management.service.UserService;
 import management.service.validator.PasswordValidator;
@@ -13,18 +15,24 @@ import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
+@Transactional
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final RatingRepository ratingRepository;
 
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, RatingRepository ratingRepository) {
         this.userRepository = userRepository;
+        this.ratingRepository = ratingRepository;
     }
-
+    @Transactional(readOnly = true)
     @Override
     public Page<GetUser> findALl(UserSearchCriteria searchCriteria, Pageable pageable) {
         Specification<User> specification = (root, query, criteriaBuilder)->{
@@ -45,11 +53,18 @@ public class UserServiceImpl implements UserService {
         if (users.isEmpty())throw new ResourceNotFoundException("empty records");
         return users.map(UserMapper::toGetDto);
     }
+    @Transactional(readOnly = true)
     @Override
-    public GetUser findOneByUsername(String username) {
+    public GetUserStatistic findOneByUsername(String username) {
         User user = findOneByUsernameEntity(username);
-        return UserMapper.toGetDto(user);
+        return UserMapper.toGetUserStaticDto(user,
+                ratingRepository.countByUsername(username),
+                ratingRepository.avgRatingByUsername(username),
+                ratingRepository.minRatingByUsername(username),
+                ratingRepository.maxRatingByUsername(username)
+                );
     }
+
     @Override
     public GetUser createOne(SaveUser saveUser) {
         PasswordValidator.validatePassword(saveUser.password(),saveUser.passwordRepeated());
@@ -68,6 +83,7 @@ public class UserServiceImpl implements UserService {
         User user = findOneByUsernameEntity(username);
         userRepository.delete(user);
     }
+    @Transactional(readOnly = true)
     @Override
     public User findOneByUsernameEntity (String username){
         return userRepository.findByUsername(username)

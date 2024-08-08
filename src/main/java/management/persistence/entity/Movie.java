@@ -1,5 +1,7 @@
 package management.persistence.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import management.util.MovieGenre;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -11,6 +13,7 @@ import java.util.List;
 
 @Entity
 @Builder
+@NoArgsConstructor @AllArgsConstructor
 public class Movie {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,7 +28,7 @@ public class Movie {
     @CreationTimestamp
     @Column(updatable = false,columnDefinition = "TIMESTAMP DEFAULT NOW()")
     private LocalDateTime createdAt;
-    @OneToMany(fetch = FetchType.EAGER,mappedBy = "movie")
+    @OneToMany(fetch = FetchType.EAGER,mappedBy = "movie",cascade = {CascadeType.REMOVE})
     private List<Rating> ratings;
 
     public List<Rating> getRatings() {

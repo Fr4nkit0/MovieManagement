@@ -3,23 +3,32 @@ package management.service.impl;
 import management.dto.request.MovieSearchCriteria;
 import management.dto.request.SaveMovie;
 import management.dto.response.GetMovie;
+import management.dto.response.GetMovieStatistic;
 import management.exceptions.ResourceNotFoundException;
 import management.mapper.MovieMapper;
 import management.persistence.entity.Movie;
 import management.persistence.repository.MovieRepository;
+import management.persistence.repository.RatingRepository;
 import management.persistence.specification.FindAllMoviesSpecification;
 import management.service.MovieService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+@Service
+@Transactional
 public class MovieServiceImpl implements MovieService {
 
     private final MovieRepository movieRepository;
+    private final RatingRepository ratingRepository;
 
-    public MovieServiceImpl(MovieRepository movieRepository) {
+    public MovieServiceImpl(MovieRepository movieRepository, RatingRepository ratingRepository) {
         this.movieRepository = movieRepository;
+        this.ratingRepository = ratingRepository;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Page<GetMovie> findALl(MovieSearchCriteria searchCriteria, Pageable pageable) {
         FindAllMoviesSpecification moviesSpecification = new FindAllMoviesSpecification(searchCriteria);
@@ -28,9 +37,16 @@ public class MovieServiceImpl implements MovieService {
         return movies.map(MovieMapper::toGetDto);
     }
 
+    @Transactional(readOnly = true)
     @Override
-    public GetMovie findOneById(Long id) {
-        return MovieMapper.toGetDto(find0neByIdEntity(id));
+    public GetMovieStatistic findOneById(Long id) {
+        Movie movie = find0neByIdEntity(id);
+        return MovieMapper.toGetMovieStatisticDto(movie,
+                ratingRepository.countByMovieId(id),
+                ratingRepository.avgRatingByMovieId(id),
+                ratingRepository.minRatingByMovieId(id),
+                ratingRepository.maxRatingByMovieId(id)
+                );
     }
 
     @Override

@@ -1,12 +1,29 @@
 package management.mapper;
 
+import jakarta.persistence.Table;
 import management.dto.request.SaveUser;
 import management.dto.response.GetUser;
+import management.dto.response.GetUserStatistic;
 import management.persistence.entity.User;
 
 import java.util.List;
 
 public class UserMapper {
+    public static GetUserStatistic toGetUserStaticDto (User entity,
+                                                       int totalRatings,
+                                                       double averageRating,
+                                                       int lowestRating,
+                                                       int highestRating){
+        if (entity==null) return null;
+        return new GetUserStatistic(
+                entity.getUsername(),
+                entity.getCreatedAt(),
+                totalRatings,
+                averageRating,
+                lowestRating,
+                highestRating
+        );
+    }
     public static GetUser toGetDto (User entity){
         if (entity==null) return null;
         int totalRatings = entity.getRatings() !=null ?

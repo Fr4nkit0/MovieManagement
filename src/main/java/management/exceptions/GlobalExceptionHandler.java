@@ -38,7 +38,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse> handleAllExceptions(Exception exception,
                                                            HttpServletRequest request,
                                                            HttpServletResponse response){
-        ZoneId zona=ZoneId.of("America/Argentina");
+        ZoneId zona=ZoneId.of("America/Argentina/Buenos_Aires");
         LocalDateTime timeTamp=LocalDateTime.now(zona);
         if (exception instanceof ResourceNotFoundException resourceNotFoundException)
             return this.handleResourceNotFoundException(resourceNotFoundException,request,response,timeTamp);
